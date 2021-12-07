@@ -28,6 +28,11 @@ const roomSchema = new Schema({
     },
     images: {
         type: Array
+    },
+    route: {
+        type: String,
+        required: true,
+        trim: true
     }
 });
 

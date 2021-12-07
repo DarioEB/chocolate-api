@@ -17,11 +17,17 @@ router.get(
 router.get(
     '/:branch',
     roomController.getRoomsBranch
-)
+);
 
 router.get(
-    '/get-image/:image',
+    '/:branch/:room',
+    roomController.getRoom
+);
+
+router.get(
+    '/get-image/image/:image',
     roomController.getImageFile
 );
+
 
 module.exports = router;

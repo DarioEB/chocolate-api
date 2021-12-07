@@ -17,31 +17,53 @@ exports.createRoom = async (req, res, next) => {
     }
 }
 
-exports.getRooms = async (req, res) => {
+exports.getRooms = async (req, res, next) => {
     try {
-        const rooms = await Room.find();
+        const rooms = await Room.find().populate("category").populate("branch");
         res.json({rooms});
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Hubo un error');
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({message: "Hubo un error"})
     }
 }
 
-exports.getRoomsBranch = async (req, res) => {
+exports.getRoomsBranch = async (req, res, next) => {
+    const branchRoute = req.params.branch;
     try {
-        const br = req.params.branch;
+        let branchExist = await Branch.findOne({route: branchRoute});
+        if(!branchExist) {
+            return res.status(401).json({message: "No se renococe la ruta de la sucursal (branch)"});
+        }
+        const rooms = await Room.find({branch: branchExist._id}).populate("category").populate("branch");
+        res.json({rooms});
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({message: "Hubo un error"});
+    }
+}
 
-        let branch = await Branch.find({branch: br});
-        if(!branch) {
-            res.status(400).json({msg: 'La sucursal enviada no existe'});
+exports.getRoom = async (req, res, next) => {
+    const branchRoute = req.params.branch;
+    const roomRoute = req.params.room;
+    
+    try {
+        let branchExist = await Branch.findOne({route: branchRoute});
+        
+        if(!branchExist) {
+            return res.status(401).json({message: "No se reconoce la ruta de la sucursal (branch)"});
+        }
+        
+        const room = await Room.findOne({route: roomRoute, branch: branchExist._id}).populate("category").populate("branch");
+        // console.log(room);
+        if(!room) {
+            return res.status(401).json({message: "No se reconoce la ruta de la habitación"});
         }
 
-        const rooms = await Room.find({branch: br});
-        res.json({rooms});
+        res.json({room, message: "Datos de la habitación obtenidos correctamente"});
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({message: "Hubo un error"});
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Hubo un error');
     }
 }
 

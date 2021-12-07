@@ -12,4 +12,9 @@ router.get(
     branchController.getBranchs
 );
 
+router.get(
+    '/:branch',
+    branchController.getBranch
+)
+
 module.exports = router;
